@@ -118,7 +118,6 @@ router.put('/:id', async (req, res) => {
     })
     .then((updatedProductTags) => res.json(updatedProductTags))
     .catch((err) => {
-      // console.log(err);
       res.status(400).json(err);
     });
 });
@@ -132,11 +131,13 @@ router.delete('/:id', async (req, res) => {
     if (!foundProdData) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    
-    const deletedProd = await Product.destroy(
+
+    await Product.destroy(
       { 
         where: { id: req.params.id }
       });
+    
+    const deletedProd = foundProdData.get({ plain: true });
     res.status(200).json(deletedProd);
   } catch (err) {
     res.status(500).json(err);

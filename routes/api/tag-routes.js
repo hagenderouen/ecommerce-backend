@@ -56,12 +56,15 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Tag not found' });
     }
 
-    const updatedTag = await Tag.update(
+    await Tag.update(
       req.body,
       {
         where: { id: req.params.id }
       }
     );
+
+    const updatedTagData = await Tag.findByPk(req.params.id);
+    const updatedTag = updatedTagData.get({ plain: true });
     res.status(200).json(updatedTag);
   } catch (err) {
     res.status(500).json(err);
@@ -77,12 +80,14 @@ router.delete('/:id', async (req, res) => {
     if (!foundTag) {
       return res.status(404).json({ error: 'Tag not found' });
     }
-    
-    const deletedTag = await Tag.destroy(
+
+    await Tag.destroy(
       {
         where: { id: req.params.id }
       }
     );
+
+    const deletedTag = foundTag.get({ plain: true });
     res.status(200).json(deletedTag);
   } catch (err) {
     res.status(500).json(err);
