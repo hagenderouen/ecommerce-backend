@@ -44,7 +44,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // create new product
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   /* req.body should look like this...
     {
       product_name: "Basketball",
@@ -76,7 +76,13 @@ router.post('/', (req, res) => {
 });
 
 // update product
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
+  // checks if product exists before updating
+  const foundProductData = await Product.findByPk(req.params.id);
+
+  if (!foundProductData) {
+    res.status(404).json({ error: 'Product not found' });
+  }
   // update product data
   Product.update(req.body, {
     where: {
@@ -120,6 +126,13 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
   try {
+    // checks if product exists before deleting
+    const foundProdData = await Product.findByPk(req.params.id);
+
+    if (!foundProdData) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
     const deletedProd = await Product.destroy(
       { 
         where: { id: req.params.id }
